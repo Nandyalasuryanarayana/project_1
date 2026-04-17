@@ -8,16 +8,19 @@
 ###########################
 
 region                      = "ap-south-1"
-vpc_name                    = "project_1"
+environment_name            = "project_1"
+vpc_name                    = "project_1_vpc"
 subnet_name                 = "project_1_private_app_subnet_az1"
 security_group_name         = "jenkins_master_sg"
-ami_id                      = ""
-instance_type               = "t3.medium"
+ami_id                      = "ami-0a1b0c508e1fa9fce"
+instance_type               = "t3.micro"
 key_name                    = "jenkins_master_key"
 instance_name               = "jenkins_master_vm"
 associate_public_ip_address = "false"
 volume_type                 = "gp3"
-volume_size                 = 10
+volume_size                 = 20
+iops                        = 3000
+throughput                  = 125
 delete_on_termination       = false
 jenkins_master_vm_tags = {
   environment                    = "project_1"

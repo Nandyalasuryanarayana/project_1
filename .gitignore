@@ -12,6 +12,9 @@ override.tf.json
 .DS_Store
 Thumbs.db
 
+# SSH keys
+*.pem
+
 # Docs / temp files
 *.docx
 ~$*

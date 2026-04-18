@@ -67,14 +67,6 @@ resource "aws_security_group" "jenkins_master_sg" {
     description = "Jenkins web UI"
   }
 
-  ingress {
-    from_port   = 50000
-    to_port     = 50000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Jenkins agent JNLP port"
-  }
-
   egress {
     from_port   = 0
     to_port     = 0

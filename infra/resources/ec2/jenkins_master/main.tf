@@ -52,11 +52,11 @@ resource "aws_security_group" "jenkins_master_sg" {
   vpc_id      = data.aws_vpc.vpc.id
 
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "SSH"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    cidr_blocks     = [var.bastion_cidr]
+    description     = "SSH from bastion subnet only"
   }
 
   ingress {
@@ -87,6 +87,20 @@ resource "aws_security_group" "jenkins_master_sg" {
   }
 }
 
+############################
+# # BASTION REMOTE STATE  ##
+############################
+
+data "terraform_remote_state" "bastion" {
+  backend = "s3"
+  config = {
+    bucket  = "terraform-remote-states-178"
+    key     = "ec2/bastion.tfstate"
+    region  = "ap-south-1"
+    profile = "devops"
+  }
+}
+
 ###########################
 # # JENKINS MASTER - VM # #
 ###########################
@@ -107,6 +121,12 @@ module "jenkins_master_ec2" {
   iops                        = var.iops
   throughput                  = var.throughput
   delete_on_termination       = var.delete_on_termination
+  user_data                   = <<-EOF
+    #!/bin/bash
+    echo "${data.terraform_remote_state.bastion.outputs.bastion_public_key}" >> /home/ubuntu/.ssh/authorized_keys
+    chmod 600 /home/ubuntu/.ssh/authorized_keys
+    chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
+  EOF
   tags = {
     Environment                    = var.jenkins_master_vm_tags.environment
     Jenkins_master_vm_backup_cycle = var.jenkins_master_vm_tags.jenkins_master_vm_backup_cycle

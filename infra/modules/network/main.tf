@@ -79,6 +79,65 @@ resource "aws_route_table_association" "public_subnet_az2_route_table_associatio
   route_table_id = aws_route_table.public_route_table.id
 }
 
+# create elastic ip for nat gateway
+resource "aws_eip" "nat_gateway_eip" {
+  domain = "vpc"
+
+  tags = {
+    Name = "${var.environment_name}_nat_gateway_eip"
+  }
+}
+
+# create nat gateway in public subnet az1
+resource "aws_nat_gateway" "nat_gateway" {
+  allocation_id = aws_eip.nat_gateway_eip.id
+  subnet_id     = aws_subnet.public_subnet_az1.id
+
+  tags = {
+    Name = "${var.environment_name}_nat_gateway"
+  }
+
+  depends_on = [aws_internet_gateway.internet_gateway]
+}
+
+# create private route table and route traffic through nat gateway
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gateway.id
+  }
+
+  tags = {
+    Name = "${var.environment_name}_private_route_table"
+  }
+}
+
+# associate private app subnet az1 to private route table
+resource "aws_route_table_association" "private_app_subnet_az1_route_table_association" {
+  subnet_id      = aws_subnet.private_app_subnet_az1.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+# associate private app subnet az2 to private route table
+resource "aws_route_table_association" "private_app_subnet_az2_route_table_association" {
+  subnet_id      = aws_subnet.private_app_subnet_az2.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+# associate private data subnet az1 to private route table
+resource "aws_route_table_association" "private_data_subnet_az1_route_table_association" {
+  subnet_id      = aws_subnet.private_data_subnet_az1.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+# associate private data subnet az2 to private route table
+resource "aws_route_table_association" "private_data_subnet_az2_route_table_association" {
+  subnet_id      = aws_subnet.private_data_subnet_az2.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
 # create private app subnet az1
 resource "aws_subnet" "private_app_subnet_az1" {
   vpc_id                  = aws_vpc.vpc.id

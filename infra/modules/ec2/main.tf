@@ -35,6 +35,8 @@ resource "aws_instance" "vartual_machine" {
   subnet_id                   = data.aws_subnets.subnets.ids[0]
   monitoring                  = true
   vpc_security_group_ids      = data.aws_security_groups.app_server_security_group.ids
+  user_data                   = var.user_data != "" ? var.user_data : null
+  user_data_replace_on_change = true
 
   lifecycle {
     create_before_destroy = true

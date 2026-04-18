@@ -61,3 +61,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "user_data" {
+  description = "User data script to run on first boot"
+  type        = string
+  default     = ""
+}

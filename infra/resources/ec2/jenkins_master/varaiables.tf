@@ -73,6 +73,11 @@ variable "delete_on_termination" {
   type        = bool
 }
 
+variable "bastion_cidr" {
+  description = "CIDR of the public subnet where bastion host lives"
+  type        = string
+}
+
 variable "jenkins_master_vm_tags" {
   description = "Additional tags for the instance"
   type = object({

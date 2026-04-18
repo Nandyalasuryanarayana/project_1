@@ -22,6 +22,7 @@ volume_size                 = 20
 iops                        = 3000
 throughput                  = 125
 delete_on_termination       = false
+bastion_cidr                = "192.168.0.0/24"
 jenkins_master_vm_tags = {
   environment                    = "project_1"
   jenkins_master_vm_backup_cycle = "weekly"

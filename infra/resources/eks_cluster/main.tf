@@ -10,7 +10,7 @@ data "aws_vpc" "vpc" {
   }
 }
 
-data "aws_subnets" "private" {
+data "aws_subnets" "node_subnets" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.vpc.id]
@@ -30,7 +30,7 @@ module "eks" {
   cluster_endpoint_public_access = true
 
   vpc_id     = data.aws_vpc.vpc.id
-  subnet_ids = data.aws_subnets.private.ids
+  subnet_ids = data.aws_subnets.node_subnets.ids
 
   eks_managed_node_group_defaults = {
     ami_type = var.ami_type

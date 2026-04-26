@@ -27,13 +27,29 @@ module "eks" {
 
   cluster_name                   = var.cluster_name
   cluster_version                = var.cluster_version
-  cluster_endpoint_public_access = true
+  cluster_endpoint_public_access           = true
+  cluster_endpoint_private_access          = true
+  enable_cluster_creator_admin_permissions = true
 
   vpc_id     = data.aws_vpc.vpc.id
   subnet_ids = data.aws_subnets.node_subnets.ids
 
+  cluster_security_group_additional_rules = {
+    vpc_ingress = {
+      description = "Allow VPC CIDR to reach EKS API"
+      protocol    = "tcp"
+      from_port   = 443
+      to_port     = 443
+      type        = "ingress"
+      cidr_blocks = [data.aws_vpc.vpc.cidr_block]
+    }
+  }
+
   eks_managed_node_group_defaults = {
     ami_type = var.ami_type
+    iam_role_additional_policies = {
+      AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+    }
   }
 
   eks_managed_node_groups = {
